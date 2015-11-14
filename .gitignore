@@ -1,2 +1,3 @@
 node_modules
-
+default.etcd
+npm-debug.log
