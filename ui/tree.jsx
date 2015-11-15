@@ -1,78 +1,115 @@
 var React = require("react"),
-    treeItems = require('./tree_items.js');
+    treeItems = require('./tree_items.js'),
+    MaterialTextField = require('material-ui/lib/text-field'),
+    MaterialDialog = require('material-ui/lib/dialog'),
+    MaterialIconButton = require('material-ui/lib/icon-button'),
+    MaterialFlatButton = require('material-ui/lib/flat-button'),
+    MaterialList = require('material-ui/lib/lists/list'),
+    MaterialListItem = require('material-ui/lib/lists/list-item'),
+    MaterialAddIcon = require('material-ui/lib/svg-icons/content/add'),
+    MaterialRemoveIcon = require('material-ui/lib/svg-icons/content/remove');
 
-class AddNodeForm extends React.Component {
+class AddDirNodeDialog extends React.Component {
   constructor(props) {
     super(props)
     this.initialName = ""
-    this.initialDir = false
-    this.state = { name: this.initialName, dir: this.initialDir }
+    this.state = { name: this.initialName }
     this.handleSubmit = this.handleSubmit.bind(this)
     this.handleChangeName = this.handleChangeName.bind(this)
-    this.handleChangeDir = this.handleChangeDir.bind(this)
+    this.handleClose = this.handleClose.bind(this)
   }
   handleSubmit(ev) {
-    treeItems.addNode(this.props.parent, this.state.name, {dir: this.state.dir})
-    this.setState({ name: this.initialName, dir: this.initialDir })
+    treeItems.addNode(this.props.parent, this.state.name, {dir: true})
+    this.setState({ name: this.initialName, dir: true })
+    this.props.handleClose()
     ev.preventDefault()
   }
   handleChangeName(event) {
     this.setState({name: event.target.value})
   }
-  handleChangeDir(event) {
-    this.setState({dir: event.target.checked})
+  handleClose() {
+    this.props.handleClose()
   }
   render() {
-    return <form onSubmit={this.handleSubmit}>
-      <input value={this.state.name} onChange={this.handleChangeName} />
-      <input type="checkbox" value={this.state.dir} onChange={this.handleChangeDir} />
-      <button type="submit">+</button>
-    </form>
+    var standardActions = [
+      <MaterialFlatButton
+        label="Cancel"
+        key="cancel"
+        secondary={true}
+        onClick={this.handleClose} />,
+      <MaterialFlatButton
+        key="add"
+        label="Add"
+        primary={true}
+        ref="submit"
+        onClick={this.handleSubmit} />
+    ]
+    return <MaterialDialog
+      title="Add Directory"
+      actions={standardActions}
+      actionFocus="submit"
+      open={this.props.open}
+      onRequestClose={this.handleClose}>
+      <MaterialTextField
+        value={this.state.name}
+        onChange={this.handleChangeName}
+        hintText="Name" />
+    </MaterialDialog>
   }
 }
 
-class Node extends React.Component {
-  constructor() {
-    this.handleDelete = this.handleDelete.bind(this)
-  }
-  handleDelete() {
-    treeItems.deleteNode(this.props.node)
-  }
-  render() {
-    var list,
-        addNodeForm
-    if (this.props.node.dir) {
-      list = <List nodes={this.props.node.nodes}></List>
-      addNodeForm = <AddNodeForm parent={this.props.node}></AddNodeForm>
+function renderList(parentNode) {
+  return parentNode.nodes.sort(function(a,b){
+    return a.key > b.key ? 1 : -1
+  }).map(function(node){
+    var handleDelete = function(){
+      treeItems.deleteNode(node)
     }
-    return <li>
-      {this.props.node.key}
-      <button onClick={this.handleDelete}>x</button>
-      {list}
-      {addNodeForm}
-    </li>
-  }
+    var props = {
+      primaryText: node.key,
+      key: node.key,
+      rightIconButton: <MaterialIconButton onClick={handleDelete}>
+        <MaterialRemoveIcon />
+      </MaterialIconButton>
+    }
+    if (node.dir) {
+      props.nestedItems = renderList(node)
+    }
+    return <MaterialListItem {...props}></MaterialListItem>
+  })
 }
 
 class List extends React.Component {
   render() {
-    return <ul>{this.props.nodes.sort(function(a,b){
-      return a.key > b.key ? 1 : -1
-    }).map(function(node){
-      return <Node node={node} key={node.key}></Node>
-    })}</ul>
+    return <MaterialList>{renderList(this.props)}</MaterialList>
   }
 }
 
 class Tree extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = { openAddDirNodeDialog: false }
+    this.handleCloseAddDirNode = this.handleCloseAddDirNode.bind(this)
+    this.handleAddDirNode = this.handleAddDirNode.bind(this)
+  }
+  handleAddDirNode() {
+    this.setState({ openAddDirNodeDialog: true })
+  }
+  handleCloseAddDirNode() {
+    this.setState({ openAddDirNodeDialog: false })
+  }
   render() {
+    var list
     if (this.props.root) {
-      return <List nodes={this.props.root.nodes}></List>
-    } else {
-      return <div>
-        <AddNodeForm></AddNodeForm>
-      </div>
+      list = <MaterialList>{renderList(this.props.root)}</MaterialList>
     }
+    return <div>
+      {list}
+      <MaterialIconButton onClick={this.handleAddDirNode}>
+        <MaterialAddIcon />
+      </MaterialIconButton>
+      <AddDirNodeDialog open={this.state.openAddDirNodeDialog} handleClose={this.handleCloseAddDirNode}></AddDirNodeDialog>
+    </div>
   }
 }
 
