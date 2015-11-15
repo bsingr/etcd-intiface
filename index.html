@@ -2,6 +2,16 @@
 <html>
   <head>
     <title>Hello World!</title>
+    <script src="bower_components/axios/dist/axios.js" charset="utf-8"></script>
+    <script type="text/javascript">
+      axios.post("http://localhost:3000/etcd", {
+        url: "http://localhost:4001",
+        method: "get",
+        params: ["/hello"]
+      }).then(function(res){
+        console.log(res.data)
+      })
+    </script>
   </head>
   <body>
     <h1>Hello World!</h1>
