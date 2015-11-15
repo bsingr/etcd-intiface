@@ -1,3 +1,5 @@
+var axios = require("axios");
+
 function fetch(key, callback) {
   axios.post("http://localhost:3000/etcd", {
     url: "http://localhost:4001",
