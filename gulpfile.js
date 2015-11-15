@@ -12,23 +12,24 @@ var reactify = require('reactify');
 
 // set up the browserify instance on a task basis
 var b = watchify(browserify({
-  entries: './ui.js',
+  entries: './ui/app.js',
   debug: true,
   transform: [reactify]
 }));
 
 function bundle() {
   return b.bundle()
-    .pipe(source('ui.js'))
+    .on('error', gutil.log)
+    .pipe(source('app.js'))
     .pipe(buffer())
     .pipe(sourcemaps.init({loadMaps: true}))
-        // Add transformation tasks to the pipeline here.
-        .pipe(uglify())
-        .on('error', gutil.log)
+    .pipe(uglify())
+    .on('error', gutil.log)
     .pipe(sourcemaps.write('./'))
     .pipe(gulp.dest('./dist/'));
 }
 
 b.on('update', bundle)
-b.on('log', gutil.log);
+b.on('log', gutil.log)
+b.on('error', gutil.log)
 gulp.task('default', bundle)
