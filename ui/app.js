@@ -4,7 +4,8 @@ var React = require('react'),
       Tree      = require('./tree.jsx'),
       treeItems = require('./tree_items.js');
 
-treeItems.load(function(state){
+treeItems.listen(function(state){
   ReactDOM.render(<Tree {...state} />,
                   document.getElementById('ui'));
-});
+})
+treeItems.load()

@@ -1,8 +1,12 @@
 var Backend = require('./backend.js');
 
-var state = {}
+var state = {},
+    listeners = []
 
 module.exports = {
+  listen: function(callback) {
+    listeners.push(callback)
+  },
   state: function() {
     return state
   },
@@ -15,8 +19,14 @@ module.exports = {
         dir: true,
         nodes: data.nodes
       }, Backend.fetchNode, function(node){
-        callback(state)
+        listeners.forEach(function(c){ c(state) })
       })
+    })
+  },
+  deleteNode: function(node) {
+    var that = this;
+    Backend.deleteNode(node, function(node){
+      that.load()
     })
   }
 }

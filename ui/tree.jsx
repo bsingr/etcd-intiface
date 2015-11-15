@@ -1,13 +1,22 @@
-var React = require("react");
+var React = require("react"),
+    treeItems = require('./tree_items.js');
 
 class Node extends React.Component {
+  constructor() {
+    this.handleClick = this.handleClick.bind(this)
+  }
+  handleClick(ev) {
+    treeItems.deleteNode(this.props.node)
+  }
   render() {
     var list
     if (this.props.node.dir) {
       list = <List nodes={this.props.node.nodes}></List>
     }
     return <li>
-      {this.props.node.key}{list}
+      {this.props.node.key}
+      <button onClick={this.handleClick}>x</button>
+      {list}
     </li>
   }
 }
