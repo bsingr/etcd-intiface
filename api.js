@@ -14,9 +14,20 @@ koaRouter.post('/etcd', koaBody, function *(next) {
   let store = etcdjs(etcdCall.url)
   yield function(callback) {
     let method = store[etcdCall.method]
-    let params = store[etcdCall.params] || []
+    if (!method) {
+      that.status = 404
+      that.body = {}
+      callback()
+      return
+    }
+    let params = etcdCall.params || []
     params.push(function(err, result) {
-      that.body = result
+      if (err) {
+        that.status = 500
+        that.body = err
+      } else {
+        that.body = result
+      }
       callback()
     })
     method.apply(store, params)

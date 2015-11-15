@@ -11,10 +11,17 @@
       }).then(function(res){
         console.log(res.data)
       })
+      axios.post("http://localhost:3000/etcd", {
+        url: "http://localhost:4001",
+        method: "set",
+        params: ["/foo/bar/baz", null, {dir: true}]
+      }).then(function(res){
+        console.log(res.data)
+      })
     </script>
   </head>
   <body>
-    <h1>Hello World!</h1>
+    <input type="text" id="etcd-url" value="http://localhost:4001" />
     We are using node <script>document.write(process.versions.node)</script>,
     Chrome <script>document.write(process.versions.chrome)</script>,
     and Electron <script>document.write(process.versions.electron)</script>.
