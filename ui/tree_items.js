@@ -28,5 +28,11 @@ module.exports = {
     Backend.deleteNode(node, function(node){
       that.load()
     })
+  },
+  addNode: function(parent, name, opts) {
+    var that = this;
+    Backend.addNode(parent, name, opts, function(node){
+      that.load()
+    })
   }
 }

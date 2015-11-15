@@ -1,10 +1,21 @@
 var axios = require("axios");
-//
-// axios.post("http://localhost:3000/etcd", {
-//   url: "http://localhost:4001",
-//   method: "set",
-//   params: ["foo/bar/baz/bar/ssad", null, {dir: true}]
-// })
+
+function addNode(parent, name, opts, callback) {
+  var key = name;
+  if (!opts) {
+    opts = {}
+  }
+  if (parent) {
+    key = parent.key + '/' + name;
+  }
+  axios.post("http://localhost:3000/etcd", {
+    url: "http://localhost:4001",
+    method: "set",
+    params: [key, opts.val, {dir: opts.dir === true}]
+  }).then(function(res){
+    callback(res.data.node)
+  })
+}
 
 function fetchNode(key, callback) {
   axios.post("http://localhost:3000/etcd", {
@@ -45,6 +56,7 @@ function traverse(data, fetchNode, callback) {
   callback(node)
   return node
 }
+module.exports.addNode = addNode
 module.exports.fetchNode = fetchNode
 module.exports.traverse = traverse
 module.exports.deleteNode = deleteNode
