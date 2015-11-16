@@ -2,3 +2,4 @@ node_modules
 default.etcd
 npm-debug.log
 dist
+etcd-intiface-*

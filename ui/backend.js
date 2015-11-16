@@ -20,7 +20,6 @@ function addNode(config, parent, name, opts, callback) {
 }
 
 function fetchNode(config, key, callback) {
-  console.log(config.url)
   axios.post(proxyUrl, {
     url: config.url,
     method: "get",

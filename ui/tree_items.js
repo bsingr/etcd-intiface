@@ -1,15 +1,16 @@
 var Backend = require('./backend.js');
 
 var state = {
-    config: {
-      url: "http://localhost:4001"
-    }
+    config: {}
   },
   listeners = []
 
 module.exports = {
   listen: function(callback) {
     listeners.push(callback)
+  },
+  triggerListeners: function() {
+    listeners.forEach(function(c){ c(state) })
   },
   state: function() {
     return state
@@ -23,7 +24,7 @@ module.exports = {
         dir: true,
         nodes: data.nodes
       }, function(node){
-        listeners.forEach(function(c){ c(state) })
+        that.triggerListeners()
       })
     })
   },
@@ -41,6 +42,7 @@ module.exports = {
   },
   setConfig: function(config) {
     state.config = config
+    this.triggerListeners()
     this.load()
   }
 }

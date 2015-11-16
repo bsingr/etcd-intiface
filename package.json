@@ -2,10 +2,13 @@
   "name": "etcd-intiface",
   "version": "1.0.0",
   "description": "",
-  "main": "main.js",
+  "main": "bootstrap.js",
   "scripts": {
     "start": "electron bootstrap.js",
-    "watch": "watchify ui.js -o static/ui.js"
+    "watch": "watchify ui.js -o static/ui.js",
+    "clean": "rm -rf etcd-intiface-*",
+    "build_osx": "npm run clean && electron-packager . etcd-intiface --platform=darwin --arch=x64 --version=0.34.3",
+    "build_win": "npm run clean && electron-packager . etcd-intiface --platform=win32 --arch=x64 --version=0.34.3"
   },
   "author": "",
   "license": "ISC",

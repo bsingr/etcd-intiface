@@ -8,4 +8,4 @@ treeItems.listen(function(state){
   ReactDOM.render(<Tree {...state} />,
                   document.getElementById('ui'));
 })
-treeItems.load()
+treeItems.setConfig({url: "http://localhost:4001"})
