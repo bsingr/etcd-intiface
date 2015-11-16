@@ -56,6 +56,7 @@ function traverse(data, fetchNode, callback) {
   callback(node)
   return node
 }
+
 module.exports.addNode = addNode
 module.exports.fetchNode = fetchNode
 module.exports.traverse = traverse
