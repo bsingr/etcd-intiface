@@ -138,6 +138,7 @@ function renderList(parentNode) {
     }
     if (node.value) {
       props.secondaryText = node.value
+      props.secondaryTextLines = 2
     }
     return <MaterialListItem {...props}></MaterialListItem>
   })
@@ -146,6 +147,30 @@ function renderList(parentNode) {
 class List extends React.Component {
   render() {
     return <MaterialList>{renderList(this.props)}</MaterialList>
+  }
+}
+
+class Configuration extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = { url: props.url }
+    this.handleChangeUrl = this.handleChangeUrl.bind(this)
+    this.handleSubmit = this.handleSubmit.bind(this)
+  }
+  handleChangeUrl(event) {
+    this.setState({url: event.target.value})
+  }
+  handleSubmit() {
+    treeItems.setConfig({url: this.state.url})
+  }
+  render() {
+    return <div>
+      <MaterialTextField
+        value={this.state.url}
+        onChange={this.handleChangeUrl}
+        hintText="URL" />
+      <MaterialRaisedButton onClick={this.handleSubmit} label="Change" primary={true}></MaterialRaisedButton>
+    </div>
   }
 }
 
@@ -177,7 +202,7 @@ class Tree extends React.Component {
     }
     return <div>
       <MaterialList>
-        <MaterialListItem><MaterialTextField value="http://localhost:4001" /></MaterialListItem>
+        <MaterialListItem><Configuration {...this.props.config}/></MaterialListItem>
       </MaterialList>
       {list}
       <MaterialList>

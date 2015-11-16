@@ -1,6 +1,8 @@
 var axios = require("axios");
 
-function addNode(parent, name, opts, callback) {
+var proxyUrl = "http://localhost:3000/etcd"
+
+function addNode(config, parent, name, opts, callback) {
   var key = name;
   if (!opts) {
     opts = {}
@@ -8,8 +10,8 @@ function addNode(parent, name, opts, callback) {
   if (parent) {
     key = parent.key + '/' + name;
   }
-  axios.post("http://localhost:3000/etcd", {
-    url: "http://localhost:4001",
+  axios.post(proxyUrl, {
+    url: config.url,
     method: "set",
     params: [key, opts.val, {dir: opts.dir === true}]
   }).then(function(res){
@@ -17,9 +19,10 @@ function addNode(parent, name, opts, callback) {
   })
 }
 
-function fetchNode(key, callback) {
-  axios.post("http://localhost:3000/etcd", {
-    url: "http://localhost:4001",
+function fetchNode(config, key, callback) {
+  console.log(config.url)
+  axios.post(proxyUrl, {
+    url: config.url,
     method: "get",
     params: [key, {recursive: true}]
   }).then(function(res){
@@ -27,9 +30,9 @@ function fetchNode(key, callback) {
   })
 }
 
-function deleteNode(node, callback) {
-  axios.post("http://localhost:3000/etcd", {
-    url: "http://localhost:4001",
+function deleteNode(config, node, callback) {
+  axios.post(proxyUrl, {
+    url: config.url,
     method: "del",
     params: [node.key, {dir: node.dir === true, recursive: true}]
   }).then(function(res){
@@ -37,15 +40,15 @@ function deleteNode(node, callback) {
   })
 }
 
-function traverse(data, fetchNode, callback) {
+function traverse(config, data, callback) {
   var node = {key: data.key}
   if (data.dir) {
     node.dir = true
     node.nodes = []
     if (data.nodes) {
       for (var i = 0; i < data.nodes.length; i++) {
-        fetchNode(data.nodes[i].key, function(data) {
-          node.nodes.push(traverse(data, fetchNode, callback))
+        fetchNode(config, data.nodes[i].key, function(data) {
+          node.nodes.push(traverse(config, data, callback))
           callback(node)
         })
       }
